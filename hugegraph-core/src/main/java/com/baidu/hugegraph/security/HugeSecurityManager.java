@@ -54,9 +54,11 @@ public class HugeSecurityManager extends SecurityManager {
     private static final Set<String> ACCEPT_CLASS_LOADERS = ImmutableSet.of(
             "groovy.lang.GroovyClassLoader",
             "sun.reflect.DelegatingClassLoader",
+            "jdk.internal.reflect.DelegatingClassLoader",
             "org.codehaus.groovy.reflection.SunClassLoader",
             "org.codehaus.groovy.runtime.callsite.CallSiteClassLoader",
-            "org.apache.hadoop.hbase.util.DynamicClassLoader"
+            "org.apache.hadoop.hbase.util.DynamicClassLoader",
+            "org.apache.tinkerpop.gremlin.groovy.loaders.GremlinLoader"
     );
 
     private static final Set<String> CAFFEINE_CLASSES = ImmutableSet.of(
@@ -355,16 +357,6 @@ public class HugeSecurityManager extends SecurityManager {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public void checkSystemClipboardAccess() {
-        if (callFromGremlin()) {
-            throw newSecurityException(
-                  "Not allowed to access system clipboard via Gremlin");
-        }
-        super.checkSystemClipboardAccess();
-    }
-
-    @Override
     public void checkPackageAccess(String pkg) {
         super.checkPackageAccess(pkg);
     }
@@ -377,24 +369,6 @@ public class HugeSecurityManager extends SecurityManager {
     @Override
     public void checkSecurityAccess(String target) {
         super.checkSecurityAccess(target);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void checkMemberAccess(Class<?> clazz, int which) {
-        super.checkMemberAccess(clazz, which);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean checkTopLevelWindow(Object window) {
-        return super.checkTopLevelWindow(window);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void checkAwtEventQueueAccess() {
-        super.checkAwtEventQueueAccess();
     }
 
     private static SecurityException newSecurityException(String message,
